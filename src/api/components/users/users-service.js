@@ -3,7 +3,7 @@ const { hashPassword, passwordMatched } = require('../../../utils/password');
 
 async function getUsers(
   pageNumber = 1,
-  pageSize = 10,
+  pageSize = null,
   sortField = 'email',
   sortOrder = 'asc',
   searchParam = null
@@ -31,8 +31,14 @@ async function getUsers(
       }
     });
 
-    const totalUsers = allUsers.length;
-    const totalPages = Math.ceil(totalUsers / pageSize);
+    const totalCount = allUsers.length;
+    if (!pageSize && totalCount > 0) {
+      pageSize = totalCount;
+    } else if (!pageSize) {
+      pageSize = 10;
+    }
+
+    const totalPages = Math.ceil(totalCount / pageSize);
     const startIndex = (pageNumber - 1) * pageSize;
     const endIndex = pageNumber * pageSize;
     const usersForPage = allUsers.slice(startIndex, endIndex);
@@ -46,7 +52,7 @@ async function getUsers(
     const paginationInfo = {
       page_number: pageNumber,
       page_size: pageSize,
-      count: usersForPage.length,
+      count: totalCount,
       total_pages: totalPages,
       has_previous_page: pageNumber > 1,
       has_next_page: pageNumber < totalPages,

@@ -7,7 +7,10 @@ async function getUsers(request, response, next) {
     const sortParam = request.query.sort || 'email:asc';
     const [sortField, sortOrder] = sortParam.split(':');
     const searchParam = request.query.search || null;
-    const pageSize = parseInt(request.query.page_size) || 10;
+    let pageSize = parseInt(request.query.page_size) || null;
+    if (isNaN(pageSize) || pageSize <= 0) {
+      pageSize = null;
+    }
 
     const users = await usersService.getUsers(
       pageNumber,
